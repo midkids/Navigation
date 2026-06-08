@@ -5,9 +5,12 @@
 //  Created by Myron Snelson on 6/6/26.
 //
 // The problem with a simple NavigationLink
+// Handling navigation the smart way
+//  with navigationDestination()
 
 import SwiftUI
 
+/*
 struct DetailView: View {
     var number: Int
     var body: some View {
@@ -33,6 +36,7 @@ struct ContentView: View {
         // Simple screen linkage
         NavigationStack {
             List (0..<1000) { i in
+                // Tap me will show up on the origin screen
                 NavigationLink("Tap me") {
                     // This is a placeholder destination view
                     // Text("Detail View")
@@ -54,6 +58,105 @@ struct ContentView: View {
                     // A presentation value solves this problem
                     DetailView(number: i)
                 }
+            }
+        }
+    }
+}
+ */
+
+/*
+// First, we will show the simplest version of navigation
+//  with a label (Tap me) and a destination view (Text(Detail View)
+//  in a single navigation link
+struct ContentView: View {
+    var body: some View {
+        NavigationStack {
+            // Tap me will show up on the origin screen
+            NavigationLink("Tap me") {
+                // This is a simple destination view
+                // It will actually slide in when
+                //  you press the Tap me link
+                // SwiftUI will automatically create
+                //  a back button to return from the Detail View
+                //  to the Content View
+                Text("Detail View")
+            }
+        }
+    }
+}
+*/
+
+/*
+// For more advanced navigation, it is better to
+//  separate the destination from the value
+// Doing so allows SwiftUI to load the destination
+//  only when it is actually needed
+// IMPORTANT: separating the destination from the value
+//  requires two steps
+// 1) We attach a value to the naviagation link
+//    It can be any value you want (e.g. string, integer,
+//    custom struct)
+//    But that value must conform to the Hashable protocol
+//    The good news: SwiftUIs built-in types conform to Hashable
+// 2) We attach a new modifier called navigation destination
+//    somewhere inside the navigation stack
+//    telling it what to do when it receives your data
+struct ContentView: View {
+    var body: some View {
+        NavigationStack {
+            // Tap me will show up on the origin screen
+            List(0..<100) { i in
+                // Hashable not required for simple integers
+                NavigationLink("Select \(i)", value: i)
+            }
+            // This will be the navigation for all integers
+            //  SwiftUI will give us the actual Int (i) and
+            //  return the correct SwiftUI view for integers
+            // If you had several types of data,
+            //  you could have multiple navigation destinations
+            // This view will slide in and have a back button
+            .navigationDestination(for: Int.self) { selection in
+                    Text("You selected \(selection)")
+            }
+        }
+    }
+}
+*/
+
+
+// Using the Hashable protocol with a custom struct
+// that contains all built-in types that
+// all conform to hashable
+// and it can be used in a Naviation Link
+
+struct Student: Hashable {
+    var id = UUID()
+    var name: String
+    var age: Int
+}
+struct ContentView: View {
+    var body: some View {
+        NavigationStack {
+            // Tap me will show up on the origin screen
+            List(0..<100) { i in
+                // Hashable not required for simple integers
+                NavigationLink("Select \(i)", value: i)
+            }
+            // This will be the navigation for all integers
+            //  SwiftUI will give us the actual Int (i) and
+            //  return the correct SwiftUI view for integers
+            // If you had several types of data,
+            //  you could have multiple navigation destinations
+            // This view will slide in and have a back button
+            .navigationDestination(for: Int.self) { selection in
+                    Text("You selected \(selection)")
+            }
+            // This is just an illustration of using a Hashable
+            //  custom struct as a nivigation destination
+            // It is NOT used in the program as there is no
+            //  navigation link using the custom struct Student
+            .navigationDestination(for: Student.self) { student in
+                    Text("You selected \(student.name)")
             }
         }
     }
