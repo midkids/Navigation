@@ -7,6 +7,7 @@
 // The problem with a simple NavigationLink
 // Handling navigation the smart way
 //  with navigationDestination()
+// Programmatic navigation with NavigationStack
 
 import SwiftUI
 
@@ -123,7 +124,7 @@ struct ContentView: View {
 }
 */
 
-
+/*
 // Using the Hashable protocol with a custom struct
 // that contains all built-in types that
 // all conform to hashable
@@ -159,6 +160,79 @@ struct ContentView: View {
                     Text("You selected \(student.name)")
             }
         }
+    }
+}
+ */
+
+// Programmatic navigation allows us to
+// move from one view to another
+// just using code
+// rather than waiting for the user to
+// take some kind of action
+// This is done by binding the path of
+// the navigation stack to an array of
+// whatever data you are trying to
+// navigate with
+// IMPORTANT: You can mix user navigation
+// and programmatic navigation
+// as much as you want
+
+struct ContentView: View {
+    // First, we create state property
+    // that is an array of integers
+    @State private var path = [Int]()
+    
+    var body: some View {
+        // Second, we bind our array to the
+        // navigation stack
+        // The result: changing the array
+        // will automatically navigate to
+        // whatever is used inside the array
+        // It becomes the active live path for
+        // for navigation
+        // But also, if we change the UI
+        // (e.g. press the back button),
+        // it will update the array automatically
+        // This is called a two-way binding
+        NavigationStack(path: $path) {
+           VStack {
+               // Set the entire array to just 32
+               // Anything else that happens to be in
+               // the path array is removed
+               // So navigation stack goes back
+               // to its original state (original view)
+               // and then it will navigate to the number 32
+               Button("Show 32") {
+                   path = [32]
+               }
+               // Here we append 64, so whatever
+               // happens to be in there already is
+               // left there and on to a new screen even
+               // deeper than that
+               // So if we aleady had some information
+               // in there, we now have extra views in the
+               // stack
+               // We will have the root view (original view)
+               // then starting to show number 64
+               Button("Show 64") {
+                   path.append(64)
+               }
+               // Will first go to view 64
+               // Then when you press the back button,
+               // the 32 view will be shown,
+               // then when you press the back button again,
+               // you will be back to the content view
+               // IMPORTANT: The elements in the path array
+               //  set the navigation path
+                Button("Show 32 then 64") {
+                       path = [32, 64]
+                   }
+            }
+           .navigationDestination(for: Int.self) { selection in
+                Text("You selected \(selection)")
+           }
+        }
+        
     }
 }
 
