@@ -306,6 +306,9 @@ struct ContentView: View {
                 }
             }
             .toolbar {
+                // IMPORTANT: Notice the view knows what type of data
+                // (Int or String) should be shown and displays the
+                // correct type of navigation destination
                 Button("Push 556") {
                     path.append(556)
                 }
