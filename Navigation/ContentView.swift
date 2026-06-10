@@ -8,6 +8,8 @@
 // Handling navigation the smart way
 //  with navigationDestination()
 // Programmatic navigation with NavigationStack
+// Navigating to different data types
+//  using NavigationPath
 
 import SwiftUI
 
@@ -177,6 +179,7 @@ struct ContentView: View {
 // and programmatic navigation
 // as much as you want
 
+/*
 struct ContentView: View {
     // First, we create state property
     // that is an array of integers
@@ -233,6 +236,92 @@ struct ContentView: View {
            }
         }
         
+    }
+}
+ */
+// Navigating to different data types takes
+//  two separate forms:
+// 1) simplest one - navigation destination
+//   with different data types, but you are not
+//   trying to track the overall path
+//   that is being shown
+// 2) programmatic navigation with
+//   different data types is more difficult
+//   because we need to bind the path of our
+//   navigation stack to an array of something
+//   Previously we did this with an array of Ints,
+//   but now we have both Ints and Strings
+//   The solution: a special type called
+//   NavigationPath which can hold a variety of
+//   types of data in a single path
+//   This works very similar to an array
+
+/*
+// Here is form 1
+// We will show five numbers and five strings
+// and nagigate them differently
+// We can navigate to either Integer or String
+// We are not trying to bind the navigation stack
+struct ContentView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(0..<5) { i in
+                    NavigationLink("Select integer: \(i)", value: i)
+                }
+                ForEach(0..<5) { i in
+                    NavigationLink("Select string: \(i)", value: String(i))
+                }
+            }
+            .navigationDestination(for: Int.self) {selection in
+                Text("You selected the integer \(selection)")
+            }
+            .navigationDestination(for: String.self) {selection in
+                Text("You selected the string \(selection)")
+            }
+            
+        }
+    }
+}
+ */
+
+// Here is form 2
+struct ContentView: View {
+    // NavigationPath is called a type eraser
+    // It will store any kind of hashable data inside
+    // without exposing exactly what type of data
+    // each item is
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        NavigationStack(path: $path) {
+            List {
+                ForEach(0..<5) { i in
+                    NavigationLink("Select integer: \(i)", value: i)
+                }
+               
+                
+                ForEach(0..<5) { i in
+                    NavigationLink("Select string: \(i)", value: String(i))
+                }
+            }
+            .toolbar {
+                Button("Push 556") {
+                    path.append(556)
+                }
+                Button("Push Hello") {
+                    path.append("Hello")
+                }
+            }
+            
+            .navigationDestination(for: Int.self) {selection in
+                Text("You selected the integer \(selection)")
+            }
+            .navigationDestination(for: String.self) {selection in
+                Text("You selected the string \(selection)")
+            }
+            
+        }
     }
 }
 
