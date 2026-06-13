@@ -10,6 +10,8 @@
 // Programmatic navigation with NavigationStack
 // Navigating to different data types
 //  using NavigationPath
+// How to make a NavigationStack return
+//  to its root view programmatically
 
 import SwiftUI
 
@@ -285,6 +287,7 @@ struct ContentView: View {
 }
  */
 
+/*
 // Here is form 2
 struct ContentView: View {
     // NavigationPath is called a type eraser
@@ -325,6 +328,99 @@ struct ContentView: View {
             }
             
         }
+    }
+}
+*/
+
+// It is common to be several layers deep in a
+// navigation stack and then need to return to
+// the very beginning
+// We will make a little sandbox than can push
+// to new views endlessly by making new
+// random numbers every time
+
+// We have two options to do this:
+// A1) Have a simple array for our path
+//    and then you simply call remove all
+//    Removing everything in the path
+//    array will send us back to the original view
+// A2) However, if you are using NavigationPath,
+//    perhaps when you are using a more than one
+//    data type in the path, then you must make
+//    a new instance of your navigation path
+//    and assign that to your path effectively
+//    wiping clean the path which will send
+//    us back to the original view
+//
+// IN EITHER CASE: We have a bigger problem:
+// How can we do either from the subview when
+// we don't have access to the original path property?
+// B1) You could store your path in an external class
+//    that uses the Observable macro
+// B2) Or, as we will do here, we can use the
+//    property wrapper Binding
+//    Binding lets us pass a piece of State
+//    into another view where
+//    we can modify it there
+//    This is effectively having a
+//    shared State value, and changing it
+//    one place will change it in all other places
+// IMPORTANT: Sharing a binding like this is
+// very common
+
+// Detail view that shows its current number
+// as its title
+// Then has a button that pushes it to a new
+// random number when it is pressed
+struct DetailView: View {
+    // The number being passed into it
+    var number: Int
+    
+// Option A1 and B2
+//    @Binding var path: [Int]
+// Options A2 and B2
+    @Binding var path: NavigationPath
+    
+    // Show link that will push to a random number
+    var body: some View {
+        NavigationLink("Go to random number", value: Int.random(in: 0...1000))
+        // show the random number in the new view
+        // as a title
+            .navigationTitle("Number: \(number)")
+            .toolbar {
+                Button("Home") {
+                    // Options A1 and B2
+                    // path.removeAll()
+                    // Options A2 and B2
+                    path = NavigationPath()
+                }
+            }
+        }
+    }
+
+// We can present the DetailView from our content view
+// giving it an initial value of zero
+// but moving to a new DetailView every time a new
+// image is shown on the screen
+struct ContentView: View {
+    // @State private var path = [Int]()
+    // Options A2 and B2
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        // Here we bind our Navigation Stack to our path
+        NavigationStack(path: $path) {
+            // Initial value of zero
+            // DetailView(number: 0)
+            // Options A1 and B2
+            DetailView(number: 0, path: $path)
+                .navigationDestination(for: Int.self) { i in
+                    // DetailView(number: i)
+                    // Options A1 and B2
+                    DetailView(number: i, path: $path)
+                }
+        }
+       
     }
 }
 
