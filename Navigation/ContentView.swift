@@ -12,6 +12,7 @@
 //  using NavigationPath
 // How to make a NavigationStack return
 //  to its root view programmatically
+// How to save NavigationStack paths using Codable
 
 import SwiftUI
 
@@ -332,6 +333,7 @@ struct ContentView: View {
 }
 */
 
+/*
 // It is common to be several layers deep in a
 // navigation stack and then need to return to
 // the very beginning
@@ -368,6 +370,23 @@ struct ContentView: View {
 // IMPORTANT: Sharing a binding like this is
 // very common
 
+// You can save the navigation stack path
+// using Codeable in
+// one of two ways depending on what
+// kind of path with which you are working
+// C1) If you have NavigationPath store your
+//    data, SwiftUI provides to helpers to
+//    to make loading and saving
+//    your paths easier
+// C2) If you have a homogenuous array (e.g
+//     just strings or just integers), you
+//     do not need the two helpers, you simply
+//     load and save your data freely
+// BOTH rely on storing your path data outside
+//  view somewhere so the all the loading and
+//  saving of path data happens invisibly
+//  Using an external class takes care of it all
+
 // Detail view that shows its current number
 // as its title
 // Then has a button that pushes it to a new
@@ -378,7 +397,7 @@ struct DetailView: View {
     
 // Option A1 and B2
 //    @Binding var path: [Int]
-// Options A2 and B2
+// Options A2 and B2 and C1
     @Binding var path: NavigationPath
     
     // Show link that will push to a random number
@@ -418,6 +437,95 @@ struct ContentView: View {
                     // DetailView(number: i)
                     // Options A1 and B2
                     DetailView(number: i, path: $path)
+                }
+        }
+       
+    }
+}
+*/
+
+
+// You can save the navigation stack path
+// using Codeable in
+// one of two ways depending on what
+// kind of path with which you are working
+// C1) If you have NavigationPath store your
+//    data, SwiftUI provides to helpers to
+//    to make loading and saving
+//    your paths easier
+// C2) If you have a homogenuous array (e.g
+//     just strings or just integers), you
+//     do not need the two helpers, you simply
+//     load and save your data freely
+// BOTH rely on storing your path data outside
+//  view somewhere so the all the loading and
+//  saving of path data happens invisibly
+//  Using an external class takes care of it all
+
+// C2 solution - path is an array of Ints
+// To make our PathScore class observed by SwiftUI
+// we use an observable macro
+@Observable
+class PathScore {
+    var path: [Int] {
+        didSet {
+            save()
+        }
+    }
+    // This is the file where we save the path
+    private let savePath = URL.documentsDirectory.appending(path: "SavedPath")
+    // The initializer will load back the path data
+    // and putting it into the path array
+    init() {
+        if let data = try? Data(contentsOf: savePath) {
+            if let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+                path = decoded
+                // Exit if file found, decoded, and loaded
+                return
+            }
+        }
+        // If we could not find or decode the file,
+        // we will start with an empty path
+        path = []
+    }
+    
+    func save() {
+        do {
+            let data = try JSONEncoder().encode(path)
+            try data.write(to: savePath)
+        } catch {
+            print("Failed to save navigation data")
+        }
+    }
+}
+struct DetailView: View {
+    // The number being passed into it
+    var number: Int
+    
+    // Show link that will push to a random number
+    var body: some View {
+        NavigationLink("Go to random number", value: Int.random(in: 0...1000))
+        // show the random number in the new view
+        // as a title
+            .navigationTitle("Number: \(number)")
+        }
+    }
+
+struct ContentView: View {
+  
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        // Here we bind our Navigation Stack to our path
+        NavigationStack(path: $path) {
+            // Initial value of zero
+            // DetailView(number: 0)
+            // Options A1 and B2
+            DetailView(number: 0)
+                .navigationDestination(for: Int.self) { i in
+                    // DetailView(number: i)
+                    // Options A1 and B2
+                    DetailView(number: i)
                 }
         }
        
