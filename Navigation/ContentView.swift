@@ -457,17 +457,22 @@ struct ContentView: View {
 //     just strings or just integers), you
 //     do not need the two helpers, you simply
 //     load and save your data freely
-// BOTH rely on storing your path data outside
+// IMPORTANT: BOTH methods rely on storing
+//  your path data OUTSIDE of the
 //  view somewhere so the all the loading and
 //  saving of path data happens invisibly
 //  Using an external class takes care of it all
 
 // C2 solution - path is an array of Ints
+// C1 solution - navigation path
 // To make our PathScore class observed by SwiftUI
 // we use an observable macro
 @Observable
-class PathScore {
-    var path: [Int] {
+class PathStore {
+    // C2
+    // var path: [Int] {
+    // C1
+    var path: NavigationPath {
         didSet {
             save()
         }
@@ -478,20 +483,60 @@ class PathScore {
     // and putting it into the path array
     init() {
         if let data = try? Data(contentsOf: savePath) {
-            if let decoded = try? JSONDecoder().decode([Int].self, from: data) {
-                path = decoded
+            // C2
+            // if let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+            // C1
+            if let decoded = try? JSONDecoder().decode(NavigationPath.CodableRepresentation.self, from: data) {
+                // C2
+                // path = decoded
+                // C1
+                // Make a navigation path our of the decoded data
+                path = NavigationPath(decoded)
                 // Exit if file found, decoded, and loaded
                 return
             }
         }
         // If we could not find or decode the file,
         // we will start with an empty path
-        path = []
+        // C2
+        // path = []
+        // C1
+        // Make an empty navigation path
+        path = NavigationPath()
     }
     
+    // C2
+    /*
+     func save() {
+     do {
+     // let data = try JSONEncoder().encode(path)
+     try data.write(to: savePath)
+     } catch {
+     print("Failed to save navigation data")
+     }
+     }
+     }
+     */
+    
+    // C1
+    // We must write the codeable representation
+    // of our navigation path
+    // By default, navigation path does not require
+    // conformance to anything other than hashable
+    // It is possible to put non-codeable objects in
+    // a navigation path
+    // As a result, SwiftUI cannot verify at compile time
+    // that our path is a valid codeable representation of
+    // a navigation path
     func save() {
+        // Check to see if our path data conforms to codeable
+        // If it does, assign it to the constant representation
+        // If it does not, make representation = nil (meaning
+        // at least one object in the path does not conform
+        // to codeable
+        guard let representation = path.codable else { return }
         do {
-            let data = try JSONEncoder().encode(path)
+            let data = try JSONEncoder().encode(representation)
             try data.write(to: savePath)
         } catch {
             print("Failed to save navigation data")
@@ -512,12 +557,19 @@ struct DetailView: View {
     }
 
 struct ContentView: View {
-  
-    @State private var path = NavigationPath()
+    // C2
+    // We no longer want to store the navigation path locally
+    // @State private var path = NavigationPath()
+    // Instead we instiate our PathStore class
+    @State private var pathStore = PathStore()
     
     var body: some View {
         // Here we bind our Navigation Stack to our path
-        NavigationStack(path: $path) {
+        // We no longer store just $path
+        // Now we must bind to our the path in our PathStore
+        // NavigationStack(path: $path) {
+        // Instead we must bind to the path in our pathStore
+        NavigationStack(path: $pathStore.path) {
             // Initial value of zero
             // DetailView(number: 0)
             // Options A1 and B2
