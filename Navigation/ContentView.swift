@@ -444,7 +444,7 @@ struct ContentView: View {
 }
 */
 
-
+/*
 // You can save the navigation stack path
 // using Codeable in
 // one of two ways depending on what
@@ -581,6 +581,45 @@ struct ContentView: View {
                 }
         }
        
+    }
+}
+*/
+
+struct ContentView: View {
+    var body: some View  {
+        NavigationStack {
+            List(0..<100) { i in
+                Text("Row \(i)")
+            }
+            // Title will be in small text
+            // But you cannot really see the bar -
+            // it is transparent.
+            .navigationTitle("Title goes here")
+            .navigationBarTitleDisplayMode(.inline)
+            
+            // Make the toolbar background blue
+            // This only takes effect when the user
+            // scrolls down from the initial view
+            .toolbarBackground(.blue)
+            
+            // This will cause the title to be
+            // white, which is easier to see
+            // after the user scrolls
+            .toolbarColorScheme(.dark)
+            
+            // As written, the above two modifiers
+            // affect all bars
+            // You can limit their effect to just
+            // navigation bars
+            // .toolbarBackground(.blue, for: .navigationBar)
+            // .toolbarColorScheme(.dark, for: .navigationBar)
+            
+            // Can hide toolbar
+            // But this causes an overlap of content
+            // with system information (e.g. clock)
+            // .toolbar(.hidden, for: .navigationBar)
+            
+        }
     }
 }
 
