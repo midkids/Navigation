@@ -13,6 +13,7 @@
 // How to make a NavigationStack return
 //  to its root view programmatically
 // How to save NavigationStack paths using Codable
+// Placing toolbar buttons in exact locations
 
 import SwiftUI
 
@@ -585,6 +586,7 @@ struct ContentView: View {
 }
 */
 
+/*
 struct ContentView: View {
     var body: some View  {
         NavigationStack {
@@ -619,6 +621,44 @@ struct ContentView: View {
             // with system information (e.g. clock)
             // .toolbar(.hidden, for: .navigationBar)
             
+        }
+    }
+}
+*/
+
+// If you place buttons inside a navigation stack
+// bar, SwiftUI automatically places them based
+// on what platform your code is running on
+// On iOS apps like this one, SwiftUI will place
+// our buttons on the trailing edge of the
+// navigation bar automatically
+// We can customize this behavior by wrapping
+// the button in a toolbar item
+struct ContentView: View {
+    var body: some View  {
+        NavigationStack {
+           Text("Hello, World!")
+                .toolbar {
+                //    ToolbarItem(placement: .topBarLeading) {
+                // This is a much better choice
+                // This is called a semantic option
+                // The button is placed and styled
+                // based on its function
+                // Typing only the . allows you to see the
+                // many options
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Tap me") {
+                            // Button action code
+                        }
+                }
+            }
+            // If you need the user to decide
+            // between saving a change or discarding it,
+            // you might want to hide the back button
+            // to force them to do so
+            // The user will not be allowed to press the
+            // back button until they have made a choice
+                .navigationBarBackButtonHidden()
         }
     }
 }
