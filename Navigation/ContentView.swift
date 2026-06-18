@@ -5,15 +5,23 @@
 //  Created by Myron Snelson on 6/6/26.
 //
 // The problem with a simple NavigationLink
+
 // Handling navigation the smart way
 //  with navigationDestination()
+
 // Programmatic navigation with NavigationStack
+
 // Navigating to different data types
 //  using NavigationPath
+
 // How to make a NavigationStack return
 //  to its root view programmatically
+
 // How to save NavigationStack paths using Codable
+
 // Placing toolbar buttons in exact locations
+
+// Making your navigation title editable
 
 import SwiftUI
 
@@ -626,6 +634,7 @@ struct ContentView: View {
 }
 */
 
+/*
 // If you place buttons inside a navigation stack
 // bar, SwiftUI automatically places them based
 // on what platform your code is running on
@@ -659,6 +668,31 @@ struct ContentView: View {
             // The user will not be allowed to press the
             // back button until they have made a choice
                 .navigationBarBackButtonHidden()
+        }
+    }
+}
+ */
+
+// If you are using an inline navigation title
+// display mode, you can also pass a binding
+// to a string to navigation title
+// This will cause a small arrow to be displayed
+// next to the title that reveals a rename button
+// to rename that particular binding
+// When to use this feature:
+//  This is a good choice when the title reflects
+//  something already entered by the user
+//  This could save adding an additional text
+//  field to your layout.
+
+
+struct ContentView: View {
+    @State private var title = "SwiftUI"
+    var body: some View  {
+        NavigationStack {
+           Text("Hello, World!")
+                .navigationTitle($title)
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
