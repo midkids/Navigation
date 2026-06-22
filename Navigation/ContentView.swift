@@ -19,6 +19,8 @@
 
 // How to save NavigationStack paths using Codable
 
+// Customizing the navigation bar appearance
+
 // Placing toolbar buttons in exact locations
 
 // Making your navigation title editable
@@ -26,6 +28,8 @@
 import SwiftUI
 
 /*
+// The problem with a simple NavigationLink
+ 
 struct DetailView: View {
     var number: Int
     var body: some View {
@@ -54,13 +58,13 @@ struct ContentView: View {
                 // Tap me will show up on the origin screen
                 NavigationLink("Tap me") {
                     // This is a placeholder destination view
-                    // Text("Detail View")
+                    //      Text("Detail View")
                     
                     // Now we will use DetailView
                     // created in the struct above
                     // But we will use it in without
                     // any complex logic surrrounding it
-                    // DetailView(number: 556)
+                    //       DetailView(number: 556)
                     
                     // Now we will make the logic more complex
                     // This causes the PROBLEM detailed above
@@ -77,7 +81,7 @@ struct ContentView: View {
         }
     }
 }
- */
+*/
 
 /*
 // First, we will show the simplest version of navigation
@@ -102,6 +106,9 @@ struct ContentView: View {
 */
 
 /*
+// Handling navigation the smart way
+//  with navigationDestination()
+  
 // For more advanced navigation, it is better to
 //  separate the destination from the value
 // Doing so allows SwiftUI to load the destination
@@ -142,7 +149,7 @@ struct ContentView: View {
 // Using the Hashable protocol with a custom struct
 // that contains all built-in types that
 // all conform to hashable
-// and it can be used in a Naviation Link
+// and it can be used in a Navigation Link
 
 struct Student: Hashable {
     var id = UUID()
@@ -152,9 +159,7 @@ struct Student: Hashable {
 struct ContentView: View {
     var body: some View {
         NavigationStack {
-            // Tap me will show up on the origin screen
             List(0..<100) { i in
-                // Hashable not required for simple integers
                 NavigationLink("Select \(i)", value: i)
             }
             // This will be the navigation for all integers
@@ -167,7 +172,7 @@ struct ContentView: View {
                     Text("You selected \(selection)")
             }
             // This is just an illustration of using a Hashable
-            //  custom struct as a nivigation destination
+            //  custom struct as a navigation destination
             // It is NOT used in the program as there is no
             //  navigation link using the custom struct Student
             .navigationDestination(for: Student.self) { student in
@@ -176,7 +181,10 @@ struct ContentView: View {
         }
     }
 }
- */
+*/
+
+/*
+// Programmatic navigation with NavigationStack
 
 // Programmatic navigation allows us to
 // move from one view to another
@@ -191,7 +199,6 @@ struct ContentView: View {
 // and programmatic navigation
 // as much as you want
 
-/*
 struct ContentView: View {
     // First, we create state property
     // that is an array of integers
@@ -217,9 +224,9 @@ struct ContentView: View {
                // So navigation stack goes back
                // to its original state (original view)
                // and then it will navigate to the number 32
-               Button("Show 32") {
-                   path = [32]
-               }
+               //   Button("Show 32") {
+               //       path = [32]
+               //   }
                // Here we append 64, so whatever
                // happens to be in there already is
                // left there and on to a new screen even
@@ -229,9 +236,9 @@ struct ContentView: View {
                // stack
                // We will have the root view (original view)
                // then starting to show number 64
-               Button("Show 64") {
-                   path.append(64)
-               }
+               //   Button("Show 64") {
+               //      path.append(64)
+               //   }
                // Will first go to view 64
                // Then when you press the back button,
                // the 32 view will be shown,
@@ -239,9 +246,9 @@ struct ContentView: View {
                // you will be back to the content view
                // IMPORTANT: The elements in the path array
                //  set the navigation path
-                Button("Show 32 then 64") {
-                       path = [32, 64]
-                   }
+               Button("Show 32 then 64") {
+                    path = [32, 64]
+                }
             }
            .navigationDestination(for: Int.self) { selection in
                 Text("You selected \(selection)")
@@ -250,7 +257,12 @@ struct ContentView: View {
         
     }
 }
- */
+*/
+
+/*
+// Navigating to different data types
+//  using NavigationPath
+ 
 // Navigating to different data types takes
 //  two separate forms:
 // 1) simplest one - navigation destination
@@ -268,7 +280,6 @@ struct ContentView: View {
 //   types of data in a single path
 //   This works very similar to an array
 
-/*
 // Here is form 1
 // We will show five numbers and five strings
 // and nagigate them differently
@@ -295,7 +306,7 @@ struct ContentView: View {
         }
     }
 }
- */
+*/
 
 /*
 // Here is form 2
@@ -343,14 +354,19 @@ struct ContentView: View {
 */
 
 /*
+// How to make a NavigationStack return
+//  to its root view programmatically
+ 
 // It is common to be several layers deep in a
 // navigation stack and then need to return to
 // the very beginning
-// We will make a little sandbox than can push
+//
+// First, we will make a little sandbox than can push
 // to new views endlessly by making new
 // random numbers every time
 
-// We have two options to do this:
+// Then, we have two options to do return
+//  to the beginning:
 // A1) Have a simple array for our path
 //    and then you simply call remove all
 //    Removing everything in the path
@@ -391,8 +407,8 @@ struct ContentView: View {
 //     just strings or just integers), you
 //     do not need the two helpers, you simply
 //     load and save your data freely
-// BOTH rely on storing your path data outside
-//  view somewhere so the all the loading and
+// BOTH rely on storing your path data outside the
+//  view somewhere so that all the loading and
 //  saving of path data happens invisibly
 //  Using an external class takes care of it all
 
@@ -411,10 +427,20 @@ struct DetailView: View {
     
     // Show link that will push to a random number
     var body: some View {
-        NavigationLink("Go to random number", value: Int.random(in: 0...1000))
+        // NavigationLink("Go to random number", value: Int.random(in: 0...1000))
+        // The code above generated the same first
+        // random number each time the app executed
+        // Per AI, this is the way this should have
+        // been coded
+        Button("Go to random number") {
+            path.append(Int.random(in: 0...1000))
+        }
+        
         // show the random number in the new view
         // as a title
             .navigationTitle("Number: \(number)")
+        // Pressing the home button will send user
+        // back to beginning screen
             .toolbar {
                 Button("Home") {
                     // Options A1 and B2
@@ -431,6 +457,7 @@ struct DetailView: View {
 // but moving to a new DetailView every time a new
 // image is shown on the screen
 struct ContentView: View {
+    // Options A1 and B2
     // @State private var path = [Int]()
     // Options A2 and B2
     @State private var path = NavigationPath()
@@ -454,6 +481,11 @@ struct ContentView: View {
 */
 
 /*
+// How to save NavigationStack paths using Codable
+ 
+// NOTE: You can only see this code work
+ // by using the simulator (not the preview)
+
 // You can save the navigation stack path
 // using Codeable in
 // one of two ways depending on what
@@ -482,6 +514,8 @@ class PathStore {
     // var path: [Int] {
     // C1
     var path: NavigationPath {
+        // Saves the navigation path
+        // each time it is changed
         didSet {
             save()
         }
@@ -489,7 +523,7 @@ class PathStore {
     // This is the file where we save the path
     private let savePath = URL.documentsDirectory.appending(path: "SavedPath")
     // The initializer will load back the path data
-    // and putting it into the path array
+    // and put it into the path array
     init() {
         if let data = try? Data(contentsOf: savePath) {
             // C2
@@ -542,7 +576,7 @@ class PathStore {
         // If it does, assign it to the constant representation
         // If it does not, make representation = nil (meaning
         // at least one object in the path does not conform
-        // to codeable
+        // to codeable)
         guard let representation = path.codable else { return }
         do {
             let data = try JSONEncoder().encode(representation)
@@ -569,32 +603,28 @@ struct ContentView: View {
     // C2
     // We no longer want to store the navigation path locally
     // @State private var path = NavigationPath()
-    // Instead we instiate our PathStore class
+    // Instead we instantiate our PathStore class
     @State private var pathStore = PathStore()
     
     var body: some View {
         // Here we bind our Navigation Stack to our path
         // We no longer store just $path
-        // Now we must bind to our the path in our PathStore
+        // Now we must bind to the path in our PathStore
         // NavigationStack(path: $path) {
         // Instead we must bind to the path in our pathStore
         NavigationStack(path: $pathStore.path) {
-            // Initial value of zero
-            // DetailView(number: 0)
-            // Options A1 and B2
             DetailView(number: 0)
                 .navigationDestination(for: Int.self) { i in
-                    // DetailView(number: i)
-                    // Options A1 and B2
                     DetailView(number: i)
                 }
         }
-       
     }
 }
 */
 
 /*
+// Customizing the navigation bar appearance
+
 struct ContentView: View {
     var body: some View  {
         NavigationStack {
@@ -635,6 +665,8 @@ struct ContentView: View {
 */
 
 /*
+// Placing toolbar buttons in exact locations
+ 
 // If you place buttons inside a navigation stack
 // bar, SwiftUI automatically places them based
 // on what platform your code is running on
@@ -671,7 +703,10 @@ struct ContentView: View {
         }
     }
 }
- */
+*/
+
+// /*
+// Making your navigation title editable
 
 // If you are using an inline navigation title
 // display mode, you can also pass a binding
@@ -696,6 +731,7 @@ struct ContentView: View {
         }
     }
 }
+//  */
 
 #Preview {
     ContentView()
